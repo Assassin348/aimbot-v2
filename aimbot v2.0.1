@@ -1,4 +1,4 @@
--- Fast ESP Toggle Script for Roblox
+-- Fast ESP Toggle Script for Roblox with Smaller Names
 -- This script creates a basic ESP system that toggles on and off rapidly
 
 local Players = game:GetService("Players")
@@ -27,32 +27,35 @@ local function createESP(player)
     local character = player.Character
     local humanoidRootPart = character.HumanoidRootPart
     
-    -- Create BillboardGui for ESP
+    -- Create BillboardGui for ESP (made smaller)
     local billboardGui = Instance.new("BillboardGui")
     billboardGui.Name = "ESP_" .. player.Name
     billboardGui.Adornee = humanoidRootPart
-    billboardGui.Size = UDim2.new(0, 100, 0, 50)
+    billboardGui.Size = UDim2.new(0, 60, 0, 25) -- Reduced from 100x50 to 60x25
     billboardGui.StudsOffset = Vector3.new(0, 2, 0)
     billboardGui.AlwaysOnTop = true
     billboardGui.Parent = game.CoreGui
     
-    -- Create Frame for visual indicator
+    -- Create Frame for visual indicator (smaller)
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(1, 0, 1, 0)
     frame.BackgroundColor3 = ESP_COLOR
     frame.BackgroundTransparency = ESP_TRANSPARENCY
-    frame.BorderSizePixel = 2
+    frame.BorderSizePixel = 1 -- Reduced border size
     frame.BorderColor3 = Color3.fromRGB(255, 255, 255)
     frame.Parent = billboardGui
     
-    -- Create TextLabel for player name
+    -- Create TextLabel for player name (much smaller)
     local nameLabel = Instance.new("TextLabel")
     nameLabel.Size = UDim2.new(1, 0, 1, 0)
     nameLabel.BackgroundTransparency = 1
     nameLabel.Text = player.Name
     nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    nameLabel.TextScaled = true
-    nameLabel.Font = Enum.Font.SourceSansBold
+    nameLabel.TextScaled = false -- Disabled auto-scaling for manual control
+    nameLabel.TextSize = 8 -- Small text size
+    nameLabel.Font = Enum.Font.SourceSans -- Smaller font
+    nameLabel.TextStrokeTransparency = 0.5 -- Add stroke for better visibility
+    nameLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
     nameLabel.Parent = frame
     
     -- Create highlight effect
@@ -69,7 +72,8 @@ local function createESP(player)
     espObjects[player] = {
         billboard = billboardGui,
         highlight = highlight,
-        frame = frame
+        frame = frame,
+        nameLabel = nameLabel
     }
 end
 
@@ -117,6 +121,26 @@ local function toggleESP()
     end
 end
 
+-- Function to adjust name size
+local function adjustNameSize(newSize)
+    for _, espData in pairs(espObjects) do
+        if espData.nameLabel then
+            espData.nameLabel.TextSize = newSize
+        end
+    end
+    print("Name size changed to: " .. newSize)
+end
+
+-- Function to adjust billboard size
+local function adjustBillboardSize(width, height)
+    for _, espData in pairs(espObjects) do
+        if espData.billboard then
+            espData.billboard.Size = UDim2.new(0, width, 0, height)
+        end
+    end
+    print("Billboard size changed to: " .. width .. "x" .. height)
+end
+
 -- Setup player connections once
 Players.PlayerAdded:Connect(function(player)
     player.CharacterAdded:Connect(function()
@@ -143,7 +167,7 @@ toggleConnection = RunService.Heartbeat:Connect(function()
     end
 end)
 
--- Speed adjustment keys
+-- Speed adjustment and size control keys
 local UserInputService = game:GetService("UserInputService")
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
@@ -159,6 +183,20 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     elseif input.KeyCode == Enum.KeyCode.T then -- Press 'T' for EXTREME speed
         TOGGLE_INTERVAL = 0.03 -- 30+ times per second
         print("EXTREME SPEED MODE! Interval: " .. TOGGLE_INTERVAL .. " seconds")
+    elseif input.KeyCode == Enum.KeyCode.One then -- Press '1' for tiny names
+        adjustNameSize(6)
+    elseif input.KeyCode == Enum.KeyCode.Two then -- Press '2' for small names
+        adjustNameSize(8)
+    elseif input.KeyCode == Enum.KeyCode.Three then -- Press '3' for medium names
+        adjustNameSize(12)
+    elseif input.KeyCode == Enum.KeyCode.Four then -- Press '4' for large names
+        adjustNameSize(16)
+    elseif input.KeyCode == Enum.KeyCode.Z then -- Press 'Z' for tiny billboard
+        adjustBillboardSize(40, 15)
+    elseif input.KeyCode == Enum.KeyCode.X then -- Press 'X' for small billboard
+        adjustBillboardSize(60, 25)
+    elseif input.KeyCode == Enum.KeyCode.C then -- Press 'C' for medium billboard
+        adjustBillboardSize(80, 35)
     end
 end)
 
@@ -172,10 +210,19 @@ Players.PlayerRemoving:Connect(function(player)
     end
 end)
 
-print("FAST ESP Toggle Script Loaded!")
+print("FAST ESP Toggle Script with Small Names Loaded!")
 print("ESP toggles every " .. TOGGLE_INTERVAL .. " seconds (VERY FAST!)")
 print("Controls:")
 print("E - Manual toggle")
 print("Q - Increase speed")
 print("R - Decrease speed") 
 print("T - EXTREME SPEED MODE")
+print("Name Size Controls:")
+print("1 - Tiny names (size 6)")
+print("2 - Small names (size 8) [DEFAULT]")
+print("3 - Medium names (size 12)")
+print("4 - Large names (size 16)")
+print("Billboard Size Controls:")
+print("Z - Tiny billboard (40x15)")
+print("X - Small billboard (60x25) [DEFAULT]")
+print("C - Medium billboard (80x35)")
